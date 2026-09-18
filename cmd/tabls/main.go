@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/fatih/color"
@@ -24,7 +25,14 @@ func timeToString(t time.Time) string {
 func main() {
 	path := "."
 	if len(os.Args) > 1 {
-		path = os.Args[1]
+		path = os.Args[len(os.Args)-1]
+	}
+
+	showHidden := false
+	for _, arg := range os.Args {
+		if arg == "-a" || arg == "--all" {
+			showHidden = true
+		}
 	}
 
 	entries, err := os.ReadDir(path)
@@ -39,6 +47,12 @@ func main() {
 	tab.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
 
 	for _, entry := range entries {
+		if strings.HasPrefix(entry.Name(), ".") {
+			if !showHidden {
+				continue
+			}
+		}
+
 		info, err := entry.Info()
 		if err != nil {
 			color.Red(err.Error())
