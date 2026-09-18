@@ -22,6 +22,22 @@ func timeToString(t time.Time) string {
 	)
 }
 
+func sizeToString(sizeBytes int64) string {
+	if sizeBytes > 1_000_000_000 {
+		return fmt.Sprintf("%.2f GB", float64(sizeBytes) / 1_000_000_000)
+	}
+
+	if sizeBytes > 1_000_000 {
+		return fmt.Sprintf("%.2f MB", float64(sizeBytes) / 1_000_000)
+	}
+
+	if sizeBytes > 1000 {
+		return fmt.Sprintf("%.2f KB", float64(sizeBytes) / 1000)
+	}
+
+	return fmt.Sprintf("%d B", sizeBytes)
+}
+
 func main() {
 	path := "."
 	if len(os.Args) > 1 {
@@ -71,7 +87,7 @@ func main() {
 		tab.AddRow(
 			info.Name(),
 			entryType,
-			info.Size(), 
+			sizeToString(info.Size()), 
 			timeToString(info.ModTime()),
 			info.Mode(),
 		)
