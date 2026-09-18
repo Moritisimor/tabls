@@ -11,17 +11,23 @@ import (
 
 func timeToString(t time.Time) string {
 	return fmt.Sprintf(
-		"%d-%d-%d %d:%d",
+		"%d-%d-%d %d:%d:%d",
 		t.Year(),
 		t.Month(),
 		t.Day(),
 		t.Hour(),
 		t.Minute(),
+		t.Second(),
 	)
 }
 
 func main() {
-	entries, err := os.ReadDir(".")
+	path := "."
+	if len(os.Args) > 1 {
+		path = os.Args[1]
+	}
+
+	entries, err := os.ReadDir(path)
 	if err != nil {
 		color.Red(err.Error())
 		os.Exit(1)
@@ -39,12 +45,22 @@ func main() {
 			os.Exit(1)
 		}
 
-		entryType := "File"
-		if info.IsDir() {
+		entryType := "Symlink"
+		if entry.Type().IsRegular() {
+			entryType = "File"
+		}
+
+		if entry.Type().IsDir() {
 			entryType = "Directory"
 		}
 
-		tab.AddRow(info.Name(), entryType, info.Size(), timeToString(info.ModTime()), info.Mode())
+		tab.AddRow(
+			info.Name(),
+			entryType,
+			info.Size(), 
+			timeToString(info.ModTime()),
+			info.Mode(),
+		)
 	}
 
 	tab.Print()
