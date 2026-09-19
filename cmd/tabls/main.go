@@ -70,7 +70,17 @@ func main() {
 	for _, arg := range os.Args[1:] {
 		if strings.HasPrefix(arg, "-") {
 			switch arg {
-			case "-r", "--recursive":
+			case "-h", "--help":
+				color.Blue("Tabls on https://github.com/Moritisimor/tabls")
+				color.Green("Usage: tabls <flags...> <directory>")
+				color.Green("Flags:")
+				color.Magenta("\t-h | --help   \tPrints this")
+				color.Magenta("\t-r | --recurse\tRecursively calculates directory sizes")
+				color.Magenta("\t-a | --all    \tShows hidden directories (Those starting with '.')")
+
+				return
+
+			case "-r", "--recurse":
 				calcDirSize = true
 
 			case "-a", "--all":
@@ -83,7 +93,7 @@ func main() {
 			continue
 		}
 
-		fmt.Printf("Path: %s\n", arg)
+		path = arg
 	}
 
 	entries, err := os.ReadDir(path)
