@@ -1,6 +1,8 @@
 # tabls
 Fancy ls-like utility.
 
+![Usage Example](./tabls_example.png)
+
 ## What is this project about?
 This is basically just ls except with a more human-friendly, tabular output of a directory's entries.
 
