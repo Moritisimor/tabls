@@ -14,7 +14,7 @@ import (
 
 func timeToString(t time.Time) string {
 	return fmt.Sprintf(
-		"%d-%d-%d %d:%d:%d",
+		"%d-%02d-%02d %02d:%02d:%02d",
 		t.Year(),
 		t.Month(),
 		t.Day(),
@@ -64,20 +64,26 @@ func calculateDirSize(dirPath string) (int64, error) {
 
 func main() {
 	path := "."
-	if len(os.Args) > 1 {
-		path = os.Args[len(os.Args)-1]
-	}
-
 	showHidden := false
 	calcDirSize := false
-	for _, arg := range os.Args {
-		if arg == "-a" || arg == "--all" {
-			showHidden = true
+
+	for _, arg := range os.Args[1:] {
+		if strings.HasPrefix(arg, "-") {
+			switch arg {
+			case "-r", "--recursive":
+				calcDirSize = true
+
+			case "-a", "--all":
+				showHidden = true
+			
+			default:
+				color.Red("Unknown flag: %s", arg)
+			}
+
+			continue
 		}
 
-		if arg == "-d" || arg == "--calcdirsize" {
-			calcDirSize = true
-		}
+		fmt.Printf("Path: %s\n", arg)
 	}
 
 	entries, err := os.ReadDir(path)
