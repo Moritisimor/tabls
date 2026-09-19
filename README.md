@@ -12,6 +12,20 @@ You will need:
 - Go 1.27.1+ 
 - Git
 
+### Installing with `go install`
+```bash
+go install github.com/Moritisimor/tabls/cmd/tabls@latest
+```
+
+Keep in mind that `~/go/bin` should be in your `$PATH`.
+
+Add it to your path like this:
+```bash
+export PATH=$PATH:~/go/bin
+```
+
+You can also add this line to your `.bashrc` or whatever shell you use.
+
 ### Clone & Build
 ```bash
 git clone https://github.com/Moritisimor/tabls
