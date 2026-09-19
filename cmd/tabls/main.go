@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -38,6 +40,28 @@ func sizeToString(sizeBytes int64) string {
 	return fmt.Sprintf("%d B", sizeBytes)
 }
 
+func calculateDirSize(dirPath string) (int64, error) {
+	var acc int64 = 0
+	err := filepath.WalkDir(dirPath, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+
+		info, err := d.Info()
+		if err != nil {
+			return err
+		}
+
+		if d.Type().IsRegular() {
+			acc += info.Size()
+		}
+
+		return nil
+	})
+
+	return acc, err
+}
+
 func main() {
 	path := "."
 	if len(os.Args) > 1 {
@@ -45,9 +69,14 @@ func main() {
 	}
 
 	showHidden := false
+	calcDirSize := false
 	for _, arg := range os.Args {
 		if arg == "-a" || arg == "--all" {
 			showHidden = true
+		}
+
+		if arg == "-d" || arg == "--calcdirsize" {
+			calcDirSize = true
 		}
 	}
 
@@ -80,14 +109,24 @@ func main() {
 			entryType = "File"
 		}
 
+		entrySize := info.Size()
 		if entry.Type().IsDir() {
 			entryType = "Directory"
+
+			if calcDirSize {
+				absPath := filepath.Join(path, info.Name())
+				entrySize, err = calculateDirSize(absPath)
+				if err != nil {
+					color.Red(err.Error())
+					os.Exit(1)
+				}
+			}
 		}
 
 		tab.AddRow(
 			info.Name(),
 			entryType,
-			sizeToString(info.Size()), 
+			sizeToString(entrySize), 
 			timeToString(info.ModTime()),
 			info.Mode(),
 		)
